@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 export default function App() {
   const [text, setText] = useState("");
+  const [info, setInfo] = useState({});
   const api = "https://kitsu.io/api/edge/";
 
   useEffect(() => {
@@ -11,7 +12,7 @@ export default function App() {
       fetch(`${api}anime?filter[text]=${text}&page[limit]=12`)
         .then((response) => response.json())
         .then((response) => {
-          console.log(response);
+          setInfo(response);
         });
     }
   }, [text]);
@@ -20,14 +21,29 @@ export default function App() {
     <div className="App">
       <h3>Olá</h3>
 
-      <strong>{text}</strong>
-
       <SeachInput
         value={text}
         onChange={(search) => {
           setText(search);
         }}
       />
+      {text && !info.data && <span>Carregando...</span>}
+
+      {info.data && (
+        <ul className="">
+          {info.data.map((anime) => (
+            <>
+              <li key={anime.id}>
+                <img
+                  src={anime.attributes.posterImage.small}
+                  alt={anime.attributes.canonicalTitle}
+                />
+              </li>
+              <strong>{anime.attributes.canonicalTitle}</strong>
+            </>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
